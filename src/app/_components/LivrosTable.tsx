@@ -13,10 +13,15 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import type { LivroDadosResponse } from "~/server/api/routers/livros";
 
-export default function LivrosTable({ livros }: { livros: any[] }) {
-  const columns = useMemo<ColumnDef<any, any>[]>(
+export default function LivrosTable({
+  livros,
+}: {
+  livros: LivroDadosResponse[];
+}) {
+  const columns = useMemo<ColumnDef<LivroDadosResponse, LivroDadosResponse>[]>(
     () => [
       { accessorKey: "id", header: "ID" },
       { accessorKey: "titulo", header: "Título" },
