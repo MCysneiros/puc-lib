@@ -10,7 +10,7 @@ interface Data {
   livros_disponiveis: number;
   livros_emprestados: number;
 }
-const baseUrl = env.NEXT_PUBLIC_API_URL as string;
+const baseUrl = env.NEXT_PUBLIC_API_URL;
 export const estatisticaRouter = createTRPCRouter({
   getEstatistica: publicProcedure
     .input(
@@ -19,12 +19,15 @@ export const estatisticaRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      const { data } = await axios.get<Data>(`${baseUrl}/estatisticas/totais/`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${input.authToken}`,
+      const { data } = await axios.get<Data>(
+        `${baseUrl}/estatisticas/totais/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${input.authToken}`,
+          },
         },
-      });
+      );
       return data;
     }),
 });

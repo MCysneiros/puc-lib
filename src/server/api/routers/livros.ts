@@ -4,7 +4,7 @@ import { z } from "zod";
 import { env } from "~/env";
 
 // Base URL para a API externa
-const baseUrl = env.NEXT_PUBLIC_API_URL as string;
+const baseUrl = env.NEXT_PUBLIC_API_URL;
 
 export interface Livro {
   titulo: string;
@@ -63,7 +63,7 @@ export const livroRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const { data } = await axios.post<LivroResponse>(
-        `${baseUrl}/api/v1/exemplares/`,
+        `${baseUrl}/exemplares/`,
         {
           titulo: input.titulo,
           descricao: input.descricao,
@@ -119,7 +119,7 @@ export const livroRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/exemplares/${input.id}/`;
+      const url = `${baseUrl}/exemplares/${input.id}/`;
       const { data } = await axios.put<PutResponse>(
         url,
         {
@@ -159,7 +159,7 @@ export const livroRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/exemplares/${input.id}/`;
+      const url = `${baseUrl}/exemplares/${input.id}/`;
       const { data } = await axios.patch<LivroResponse>(url, input.updates, {
         headers: {
           "Content-Type": "application/json",
@@ -172,7 +172,7 @@ export const livroRouter = createTRPCRouter({
   getLivro: publicProcedure
     .input(z.object({ authToken: z.string(), id: z.string() }))
     .query(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/exemplares/${input.id}/`;
+      const url = `${baseUrl}exemplares/${input.id}/`;
       const { data } = await axios.get<LivroDadosResponse>(url, {
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +185,7 @@ export const livroRouter = createTRPCRouter({
   getTodosLivros: publicProcedure
     .input(z.object({ authToken: z.string() }))
     .query(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/exemplares/`;
+      const url = `${baseUrl}/exemplares/`;
       const { data } = await axios.get<LivroDadosResponse[]>(url, {
         headers: {
           "Content-Type": "application/json",
@@ -198,7 +198,7 @@ export const livroRouter = createTRPCRouter({
   getLivrosDisponiveis: publicProcedure
     .input(z.object({ authToken: z.string() }))
     .query(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/livros/disponiveis/`;
+      const url = `${baseUrl}/livros/disponiveis/`;
       const { data } = await axios.get<Tiragem[]>(url, {
         headers: {
           "Content-Type": "application/json",
@@ -212,7 +212,7 @@ export const livroRouter = createTRPCRouter({
   getLivrosIndisponiveis: publicProcedure
     .input(z.object({ authToken: z.string() }))
     .query(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/livros/indisponiveis/`;
+      const url = `${baseUrl}/livros/indisponiveis/`;
       const { data } = await axios.get<LivroDadosResponse[]>(url, {
         headers: {
           "Content-Type": "application/json",

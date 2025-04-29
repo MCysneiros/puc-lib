@@ -3,7 +3,7 @@ import { z } from "zod";
 import axios from "axios";
 import { env } from "~/env";
 
-const baseUrl = env.NEXT_PUBLIC_API_URL as string;
+const baseUrl = env.NEXT_PUBLIC_API_URL;
 
 interface Emprestimo {
   aluno: number;

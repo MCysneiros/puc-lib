@@ -3,9 +3,9 @@ import axios from "axios";
 import { z } from "zod";
 import { env } from "~/env";
 
-const baseUrl = env.NEXT_PUBLIC_API_URL as string;
+const baseUrl = env.NEXT_PUBLIC_API_URL;
 
-interface Aluno {
+export interface Aluno {
   cpf: string;
   nome: string;
   sobreNome: string;
@@ -16,7 +16,7 @@ interface Aluno {
   endereco: string;
 }
 interface Id {
-  id: string;
+  id: number;
 }
 
 export type AlunoWithId = Aluno & Id;

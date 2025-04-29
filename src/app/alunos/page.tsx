@@ -1,13 +1,13 @@
 import { api, HydrateClient } from "~/trpc/server";
-import LivrosTable from "./_components/LivrosTable";
+import AlunosTable from "../_components/AlunosTable";
 
-export default async function Home() {
+export default async function AlunosPage() {
   const data = await api.token.getTokens({
     username: "fernando",
     password: "admin***",
   });
 
-  const livro = await api.livro.getTodosLivros({
+  const alunos = await api.aluno.getAllAlunos({
     authToken: data.access,
   });
 
@@ -16,7 +16,7 @@ export default async function Home() {
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#e6e6e6] text-black">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <div className="w-full overflow-x-auto">
-            <LivrosTable livros={Array.isArray(livro) ? livro : []} />
+            <AlunosTable alunos={Array.isArray(alunos) ? alunos : []} />
           </div>
         </div>
       </main>

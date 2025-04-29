@@ -11,17 +11,11 @@ export const tokenRouter = createTRPCRouter({
   getTokens: publicProcedure
     .input(z.object({ username: z.string(), password: z.string() }))
     .mutation(async ({ input }) => {
-      console.log("input", input);
       const { data } = await axios.post<Token>(
-        `http://3.82.202.97/api/tokens/`,
+        `http://3.82.202.97/api/token/`,
         {
           username: input.username,
           password: input.password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
         },
       );
       return data;
