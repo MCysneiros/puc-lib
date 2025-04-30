@@ -24,7 +24,6 @@ export default function AlunosTable({ alunos }: { alunos: AlunoWithId[] }) {
   const setAlunos = useAlunosStore((s) => s.setAlunos);
 
   useEffect(() => {
-    console.log(alunos);
     setAlunos(alunos);
   }, [alunos, setAlunos]);
 

@@ -5,6 +5,7 @@ import { useLivrosStore } from "~/trpc/livros-store";
 export default function LivroDetalhePageClient() {
   const { id } = useParams<{ id: string }>();
 
+  console.log(useLivrosStore.getState());
   const livro = useLivrosStore
     .getState()
     .livros.find((l) => l.id === Number(id));
@@ -36,7 +37,26 @@ export default function LivroDetalhePageClient() {
         <b>Total de Exemplares:</b> {livro.total_exemplares}
       </div>
       <div className="mb-2">
-        <b>Tiragens:</b> {livro.tiragens?.length ?? 0}
+        {livro.tiragens && livro.tiragens.length > 0 && (
+          <div className="mt-2">
+            <div className="rounded bg-gray-100 p-2">
+              <div className="mb-2 font-semibold text-black">Tiragens</div>
+              <div className="flex flex-col gap-2">
+                {livro.tiragens.map((tiragem, idx) => (
+                  <div key={idx} className="rounded border bg-white p-2 shadow">
+                    {typeof tiragem === "object"
+                      ? Object.entries(tiragem).map(([key, value]) => (
+                          <div key={key}>
+                            <b>{key}:</b> {String(value)}
+                          </div>
+                        ))
+                      : tiragem}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

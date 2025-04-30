@@ -13,14 +13,24 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import type { LivroDadosResponse } from "~/server/api/routers/livros";
+import { useLivrosStore } from "../../trpc/livros-store";
 
 export default function LivrosTable({
   livros,
 }: {
   livros: LivroDadosResponse[];
 }) {
+  const router = useRouter();
+  const setLivros = useLivrosStore((s) => s.setLivros);
+
+  useEffect(() => {
+    if (livros.length === 0) return;
+    setLivros(livros);
+  }, [livros, setLivros]);
+
   const columns = useMemo<ColumnDef<LivroDadosResponse, LivroDadosResponse>[]>(
     () => [
       { accessorKey: "id", header: "ID" },
@@ -62,7 +72,7 @@ export default function LivrosTable({
             className="cursor-pointer hover:bg-gray-100"
             onClick={() => {
               const id = row.original.id;
-              if (id) window.location.href = `/livros/${id}`;
+              if (id) router.push(`/${id}`);
             }}
           >
             {row.getVisibleCells().map((cell) => (
