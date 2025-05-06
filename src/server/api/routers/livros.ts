@@ -199,7 +199,7 @@ export const livroRouter = createTRPCRouter({
     .input(z.object({ authToken: z.string() }))
     .query(async ({ input }) => {
       const url = `${baseUrl}/livros/disponiveis/`;
-      const { data } = await axios.get<Tiragem[]>(url, {
+      const { data } = await axios.get<LivroDadosResponse[]>(url, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${input.authToken}`,

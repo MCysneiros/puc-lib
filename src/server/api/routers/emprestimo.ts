@@ -117,7 +117,7 @@ export const emprestimoRouter = createTRPCRouter({
     .query(
       async ({ input }: { input: { aluno: number; authToken: string } }) => {
         const { data } = await axios.get<EmprestimoDTO[]>(
-          `${baseUrl}/aluno/${input.aluno}/emprestimos/`,
+          `${baseUrl}/alunos/${input.aluno}/emprestimos/`,
           {
             headers: {
               "Content-Type": "application/json",

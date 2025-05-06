@@ -32,7 +32,7 @@ export default function AlunosTable({ alunos }: { alunos: AlunoWithId[] }) {
       { accessorKey: "id", header: "ID" },
       { accessorKey: "cpf", header: "CPF" },
       { accessorKey: "nome", header: "Nome" },
-      { accessorKey: "sobreNome", header: "Sobrenome" },
+      { accessorKey: "sobrenome", header: "Sobrenome" },
       { accessorKey: "nascimento", header: "Nascimento" },
       { accessorKey: "email", header: "Email" },
       { accessorKey: "tel1", header: "Telefone 1" },

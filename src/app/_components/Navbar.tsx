@@ -22,16 +22,16 @@ export default function Navbar() {
         </li>
         <li
           className={
-            pathname === "/emprestimo"
+            pathname === "/emprestimos"
               ? "h-full rounded bg-[#99e599]"
               : "h-full"
           }
         >
           <Link
-            href="/emprestimo"
-            className={`flex h-full items-center px-2 hover:underline px-2${pathname === "/emprestimo" ? "text-white" : ""}`}
+            href="/emprestimos"
+            className={`flex h-full items-center px-2 hover:underline px-2${pathname === "/emprestimos" ? "text-white" : ""}`}
           >
-            Empréstimo
+            Empréstimos
           </Link>
         </li>
         <li

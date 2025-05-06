@@ -5,6 +5,7 @@ type AlunoStore = {
   alunos: AlunoWithId[];
   setAlunos: (alunos: AlunoWithId[]) => void;
   getAlunoById: (id: number) => AlunoWithId | undefined;
+  editAluno: (aluno: AlunoWithId) => void;
 };
 
 export const useAlunosStore = create<AlunoStore>((set, get) => ({
@@ -12,4 +13,10 @@ export const useAlunosStore = create<AlunoStore>((set, get) => ({
   setAlunos: (alunos) => set({ alunos }),
   getAllAlunos: () => get().alunos,
   getAlunoById: (id) => get().alunos.find((a) => a.id === id),
+  editAluno: (editedAluno) =>
+    set((state) => ({
+      alunos: state.alunos.map((aluno) =>
+        aluno.id === editedAluno.id ? editedAluno : aluno,
+      ),
+    })),
 }));

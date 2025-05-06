@@ -8,7 +8,7 @@ const baseUrl = env.NEXT_PUBLIC_API_URL;
 export interface Aluno {
   cpf: string;
   nome: string;
-  sobreNome: string;
+  sobrenome: string;
   nascimento: Date;
   email: string;
   tel1: string;
@@ -32,7 +32,7 @@ export const alunoRouter = createTRPCRouter({
       z.object({
         cpf: z.string(),
         nome: z.string(),
-        sobreNome: z.string(),
+        sobrenome: z.string(),
         nascimento: z.string().optional(),
         email: z.string(),
         tel1: z.string(),
@@ -47,7 +47,7 @@ export const alunoRouter = createTRPCRouter({
         {
           cpf: input.cpf,
           nome: input.nome,
-          sobreNome: input.sobreNome,
+          sobrenome: input.sobrenome,
           nascimento: input.nascimento,
           email: input.email,
           tel1: input.tel1,
@@ -73,7 +73,7 @@ export const alunoRouter = createTRPCRouter({
           .object({
             cpf: z.string().optional(),
             nome: z.string().optional(),
-            sobreNome: z.string().optional(),
+            sobrenome: z.string().optional(),
             nascimento: z.string().optional(),
             email: z.string().optional(),
             tel1: z.string().optional(),
@@ -104,7 +104,7 @@ export const alunoRouter = createTRPCRouter({
           .object({
             cpf: z.string().optional(),
             nome: z.string().optional(),
-            sobreNome: z.string().optional(),
+            sobrenome: z.string().optional(),
             nascimento: z.string().optional(),
             email: z.string().optional(),
             tel1: z.string().optional(),
