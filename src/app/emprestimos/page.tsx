@@ -1,6 +1,6 @@
 import { api, HydrateClient } from "~/trpc/server";
 import AuthTokenInitializer from "../_components/AuthTokenInitializer";
-import EmprestimoPageClient from "./EmprestimoPageClient";
+import EmprestimosTabsClient from "./EmprestimosTabsClient";
 
 export default async function EmprestimosPage() {
   const data = await api.token.getTokens({
@@ -12,7 +12,7 @@ export default async function EmprestimosPage() {
     authToken: data.access,
   });
 
-  let livros = await api.livro.getLivrosDisponiveis({
+  let livros = await api.livro.getTodosLivros({
     authToken: data.access,
   });
 
@@ -38,11 +38,13 @@ export default async function EmprestimosPage() {
       />
 
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#e6e6e6] text-black">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
+        <div className="container flex flex-col items-center justify-center gap-8 px-4 py-12">
           <div className="flex w-full flex-col items-center">
-            <h1 className="mb-8 text-3xl font-bold">Registrar Empréstimo</h1>
-            <div className="w-full max-w-2xl">
-              <EmprestimoPageClient alunos={alunos} livros={livros} />
+            <h1 className="mb-6 text-3xl font-bold">
+              Gerenciamento de Empréstimos
+            </h1>
+            <div className="w-full max-w-4xl">
+              <EmprestimosTabsClient alunos={alunos} livros={livros} />
             </div>
           </div>
         </div>
