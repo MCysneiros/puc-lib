@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { useAlunosStore } from "~/trpc/alunos-store";
 import { useAuthStore } from "~/trpc/auth-store";
 import { useState, useEffect } from "react";
-import { FaEdit, FaTimes, FaSave } from "react-icons/fa";
+import { FaSave, FaTimes } from "react-icons/fa";
 import { api } from "~/trpc/react";
 import type { AlunoWithId } from "~/server/api/routers/alunos";
 import type { EmprestimoDTO } from "~/server/api/routers/emprestimo";
@@ -17,6 +17,7 @@ export default function AlunoDetalhePageClient() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Buscar o aluno usando um estado local para garantir a reatividade
   const [currentAluno, setCurrentAluno] = useState<AlunoEditable | null>(null);
@@ -106,7 +107,7 @@ export default function AlunoDetalhePageClient() {
     setEditedAluno((prev) => ({ ...prev!, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editedAluno) return;
 
     setError(null);
@@ -116,6 +117,40 @@ export default function AlunoDetalhePageClient() {
     if (!authToken) {
       setError("Erro de autenticação. Faça login novamente.");
       return;
+    }
+
+    try {
+      try {
+        await api.aluno.editAluno.mutate({
+          id: String(editedAluno.id),
+          authToken,
+          updates: {
+            cpf: editedAluno.cpf,
+            nome: editedAluno.nome,
+            sobrenome: editedAluno.sobrenome,
+            nascimento: editedAluno.nascimento,
+            email: editedAluno.email,
+            tel1: editedAluno.tel1,
+            tel2: editedAluno.tel2,
+            endereco: editedAluno.endereco,
+          },
+        });
+        setSuccess("Aluno atualizado com sucesso!");
+        setEditMode(false);
+        setCurrentAluno(editedAluno);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("Erro ao atualizar o aluno. Tente novamente.");
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Erro ao atualizar o aluno. Tente novamente.");
+      }
     }
 
     // Criar objeto com os campos modificados
@@ -176,28 +211,24 @@ export default function AlunoDetalhePageClient() {
   };
 
   return (
-    <div className="mx-auto mt-10 max-w-md rounded bg-white p-6 shadow">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Detalhes do Aluno</h2>
+    <div className="bg-card mx-auto mt-10 max-w-md rounded-xl p-8 shadow-lg">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-foreground text-2xl font-bold">
+          Detalhes do Aluno
+        </h2>
         {editMode ? (
           <div className="flex space-x-2">
             <FaSave
-              className={`cursor-pointer text-xl ${mutation.isPending ? "text-gray-400" : "text-green-600"}`}
-              onClick={!mutation.isPending ? handleSave : undefined}
-              title="Salvar todas as alterações"
+              onClick={handleSave}
+              className="cursor-pointer text-green-500 hover:text-green-600"
             />
             <FaTimes
-              className="cursor-pointer text-xl text-red-600"
               onClick={toggleEditMode}
-              title="Cancelar edição"
+              className="cursor-pointer text-red-500 hover:text-red-600"
             />
           </div>
         ) : (
-          <FaEdit
-            className="cursor-pointer text-xl text-blue-600"
-            onClick={toggleEditMode}
-            title="Editar informações"
-          />
+          <div className="flex items-center gap-4"></div>
         )}
       </div>
 
@@ -211,23 +242,28 @@ export default function AlunoDetalhePageClient() {
         </div>
       )}
 
-      <div className="mb-2">
-        <b>ID:</b> {currentAluno.id}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {renderField("ID", "id", currentAluno.id)}
+          {renderField("Nome", "nome", currentAluno.nome)}
+          {renderField("Sobrenome", "sobrenome", currentAluno.sobrenome)}
+          {renderField("CPF", "cpf", currentAluno.cpf)}
+          {renderField(
+            "Nascimento",
+            "nascimento",
+            currentAluno.nascimento instanceof Date
+              ? currentAluno.nascimento.toDateString()
+              : currentAluno.nascimento,
+          )}
+          {renderField("Email", "email", currentAluno.email)}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {renderField("Telefone 1", "tel1", currentAluno.tel1)}
+          {renderField("Telefone 2", "tel2", currentAluno.tel2 ?? "-")}
+          {renderField("Endereço", "endereco", currentAluno.endereco)}
+        </div>
       </div>
-      {renderField("Nome", "nome", currentAluno.nome)}
-      {renderField("Sobrenome", "sobrenome", currentAluno.sobrenome)}
-      {renderField("CPF", "cpf", currentAluno.cpf)}
-      {renderField(
-        "Nascimento",
-        "nascimento",
-        currentAluno.nascimento instanceof Date
-          ? currentAluno.nascimento.toDateString()
-          : currentAluno.nascimento,
-      )}
-      {renderField("Email", "email", currentAluno.email)}
-      {renderField("Telefone 1", "tel1", currentAluno.tel1)}
-      {renderField("Telefone 2", "tel2", currentAluno.tel2 ?? "-")}
-      {renderField("Endereço", "endereco", currentAluno.endereco)}
 
       {/* Seção de Empréstimos */}
       <div className="mt-8">
@@ -239,16 +275,27 @@ export default function AlunoDetalhePageClient() {
           <div className="overflow-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b bg-gray-100 text-left">
-                  <th className="p-2 text-sm">Título</th>
-                  <th className="p-2 text-sm">Data Empréstimo</th>
-                  <th className="p-2 text-sm">Previsão</th>
-                  <th className="p-2 text-sm">Status</th>
+                <tr className="bg-muted/50 border-b text-left">
+                  <th className="text-muted-foreground p-2 text-sm font-medium">
+                    Título
+                  </th>
+                  <th className="text-muted-foreground p-2 text-sm font-medium">
+                    Data Empréstimo
+                  </th>
+                  <th className="text-muted-foreground p-2 text-sm font-medium">
+                    Previsão
+                  </th>
+                  <th className="text-muted-foreground p-2 text-sm font-medium">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {emprestimos.map((emprestimo) => (
-                  <tr key={emprestimo.id} className="border-b hover:bg-gray-50">
+                  <tr
+                    key={emprestimo.id}
+                    className="hover:bg-muted/50 border-b"
+                  >
                     <td className="p-2 text-sm">{emprestimo.titulo_livro}</td>
                     <td className="p-2 text-sm">
                       {new Date(emprestimo.dt_emprestimo).toLocaleDateString(
@@ -262,14 +309,14 @@ export default function AlunoDetalhePageClient() {
                     </td>
                     <td className="p-2 text-sm">
                       {emprestimo.dt_devolucao ? (
-                        <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
+                        <span className="inline-flex items-center rounded bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
                           Devolvido em{" "}
                           {new Date(emprestimo.dt_devolucao).toLocaleDateString(
                             "pt-BR",
                           )}
                         </span>
                       ) : (
-                        <span className="rounded bg-yellow-100 px-2 py-1 text-xs text-yellow-800">
+                        <span className="inline-flex items-center rounded bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700">
                           Em andamento
                         </span>
                       )}
@@ -280,7 +327,7 @@ export default function AlunoDetalhePageClient() {
             </table>
           </div>
         ) : (
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             Este aluno não possui empréstimos registrados.
           </p>
         )}
@@ -291,6 +338,12 @@ export default function AlunoDetalhePageClient() {
           </p>
         )}
       </div>
+
+      {/* <ModalCreateAluno
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        aluno={aluno}
+      /> */}
     </div>
   );
 }

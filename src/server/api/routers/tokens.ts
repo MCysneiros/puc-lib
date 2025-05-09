@@ -1,11 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import axios from "axios";
 import { z } from "zod";
-
-interface Token {
-  refresh: string;
-  access: string;
-}
+import type { Token } from "~/types";
 
 export const tokenRouter = createTRPCRouter({
   getTokens: publicProcedure

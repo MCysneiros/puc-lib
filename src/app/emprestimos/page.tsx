@@ -37,16 +37,9 @@ export default async function EmprestimosPage() {
         refreshToken={data.refresh}
       />
 
-      <main className="flex min-h-screen flex-col items-center justify-center bg-[#e6e6e6] text-black">
-        <div className="container flex flex-col items-center justify-center gap-8 px-4 py-12">
-          <div className="flex w-full flex-col items-center">
-            <h1 className="mb-6 text-3xl font-bold">
-              Gerenciamento de Empréstimos
-            </h1>
-            <div className="w-full max-w-4xl">
-              <EmprestimosTabsClient alunos={alunos} livros={livros} />
-            </div>
-          </div>
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4 py-8">
+          <EmprestimosTabsClient alunos={alunos} livros={livros} />
         </div>
       </main>
     </HydrateClient>

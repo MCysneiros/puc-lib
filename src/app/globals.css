@@ -1,0 +1,61 @@
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+  --card-rgb: 255, 255, 255;
+  --border-rgb: 209, 213, 219;
+  --primary-rgb: 14, 165, 233;
+  --secondary-rgb: 100, 116, 139;
+  --success-rgb: 34, 197, 94;
+  --danger-rgb: 239, 68, 68;
+  --muted-rgb: 107, 114, 128;
+  --muted-foreground-rgb: 107, 114, 128;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+/* Estilos baseados nas cores do Tailwind */
+.bg-primary {
+  background-color: rgb(var(--primary-rgb));
+}
+
+.bg-secondary {
+  background-color: rgb(var(--secondary-rgb));
+}
+
+.bg-success {
+  background-color: rgb(var(--success-rgb));
+}
+
+.bg-danger {
+  background-color: rgb(var(--danger-rgb));
+}
+
+.text-primary {
+  color: rgb(var(--primary-rgb));
+}
+
+.text-secondary {
+  color: rgb(var(--secondary-rgb));
+}
+
+.text-success {
+  color: rgb(var(--success-rgb));
+}
+
+.text-danger {
+  color: rgb(var(--danger-rgb));
+}
+
+.text-muted-foreground {
+  color: rgb(var(--muted-foreground-rgb));
+}
+
+.border-border {
+  border-color: rgb(var(--border-rgb));
+}

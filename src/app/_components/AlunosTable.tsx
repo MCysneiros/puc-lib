@@ -49,12 +49,12 @@ export default function AlunosTable({ alunos }: { alunos: AlunoWithId[] }) {
   });
 
   return (
-    <Table>
-      <TableHeader>
+    <Table className="min-w-full">
+      <TableHeader className="bg-muted/50">
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <TableHead key={header.id}>
+              <TableHead key={header.id} className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext(),
@@ -64,13 +64,13 @@ export default function AlunosTable({ alunos }: { alunos: AlunoWithId[] }) {
           </TableRow>
         ))}
       </TableHeader>
-      <TableBody>
+      <TableBody className="bg-card divide-y divide-border">
         {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
+          <TableRow key={row.id} className="cursor-pointer hover:bg-muted/50">
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
-                className="cursor-pointer hover:bg-gray-100"
+                className="px-6 py-4 whitespace-nowrap text-sm text-foreground"
                 onClick={() => {
                   const id = row.original.id;
                   if (id) router.push(`/alunos/${id}`);

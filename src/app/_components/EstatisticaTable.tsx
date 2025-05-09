@@ -14,37 +14,39 @@ export default function EstatisticaTable({
   estatistica: EstatisticaData;
 }) {
   return (
-    <div className="mx-auto mt-8 w-full max-w-xl">
-      <table className="w-full rounded bg-[#e6e6e6] text-black shadow">
-        <thead>
-          <tr>
-            <th className="p-2 text-left">Estatística</th>
-            <th className="p-2 text-left">Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="p-2">Total de Alunos</td>
-            <td className="p-2">{estatistica.total_alunos}</td>
-          </tr>
-          <tr>
-            <td className="p-2">Total de Livros</td>
-            <td className="p-2">{estatistica.total_livros}</td>
-          </tr>
-          <tr>
-            <td className="p-2">Total de Tiragens</td>
-            <td className="p-2">{estatistica.total_tiragens}</td>
-          </tr>
-          <tr>
-            <td className="p-2">Livros Disponíveis</td>
-            <td className="p-2">{estatistica.livros_disponiveis}</td>
-          </tr>
-          <tr>
-            <td className="p-2">Livros Emprestados</td>
-            <td className="p-2">{estatistica.livros_emprestados}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="w-full">
+      <div className="overflow-x-auto">
+        <table className="w-full rounded-lg border-collapse overflow-hidden">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="border-b border-gray-200 p-3 text-left text-sm font-semibold text-gray-700">Estatística</th>
+              <th className="border-b border-gray-200 p-3 text-left text-sm font-semibold text-gray-700">Valor</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            <tr className="hover:bg-gray-50 transition-colors duration-150">
+              <td className="p-3 text-sm text-gray-700">Total de Alunos</td>
+              <td className="p-3 text-sm font-medium text-gray-800">{estatistica.total_alunos}</td>
+            </tr>
+            <tr className="hover:bg-gray-50 transition-colors duration-150">
+              <td className="p-3 text-sm text-gray-700">Total de Livros</td>
+              <td className="p-3 text-sm font-medium text-gray-800">{estatistica.total_livros}</td>
+            </tr>
+            <tr className="hover:bg-gray-50 transition-colors duration-150">
+              <td className="p-3 text-sm text-gray-700">Total de Exemplares</td>
+              <td className="p-3 text-sm font-medium text-gray-800">{estatistica.total_tiragens}</td>
+            </tr>
+            <tr className="hover:bg-gray-50 transition-colors duration-150">
+              <td className="p-3 text-sm text-gray-700">Exemplares Disponíveis</td>
+              <td className="p-3 text-sm font-medium text-gray-800">{estatistica.livros_disponiveis}</td>
+            </tr>
+            <tr className="hover:bg-gray-50 transition-colors duration-150">
+              <td className="p-3 text-sm text-gray-700">Exemplares Emprestados</td>
+              <td className="p-3 text-sm font-medium text-gray-800">{estatistica.livros_emprestados}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
