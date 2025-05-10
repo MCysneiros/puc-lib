@@ -17,8 +17,6 @@ export default function ListaEmprestimosClient() {
   const [confirmingReturn, setConfirmingReturn] = useState<number | null>(null);
   const authToken = useAuthStore.getState().getAccessToken();
 
-  console.log(emprestimos);
-
   // Buscar todos os empréstimos usando a query todosOsEmprestimos
   const emprestimosQuery = api.emprestimo.todosOsEmprestimos.useQuery(
     { authToken: authToken ?? "" },
@@ -32,15 +30,12 @@ export default function ListaEmprestimosClient() {
         `Devolução registrada com sucesso em ${new Date(data.data_devolucao).toLocaleDateString("pt-BR")}`,
       );
       setConfirmingReturn(null);
-      // Refetch para atualizar a lista de empréstimos
       void emprestimosQuery.refetch();
-      // Limpar a mensagem de sucesso após 5 segundos
       setTimeout(() => setSuccessMessage(null), 5000);
     },
     onError: (error) => {
       setError(`Erro ao registrar devolução: ${error.message}`);
       setConfirmingReturn(null);
-      // Limpar a mensagem de erro após 5 segundos
       setTimeout(() => setError(null), 5000);
     },
   });
@@ -100,13 +95,18 @@ export default function ListaEmprestimosClient() {
     );
   }
 
-  // Função para lidar com a devolução de livro
-  const handleReturnBook = (id: number) => {
+  // Função para lidar com a devolução de livro usando tiragem
+  const handleReturnBook = (tiragemparam: number) => {
     if (!authToken) {
       setError("Erro de autenticação. Faça login novamente.");
       return;
     }
-    devolucaoMutation.mutate({ id, authToken });
+    
+    // Usamos o id como alias para tiragem para compatibilidade com a API
+    devolucaoMutation.mutate({ 
+      id: tiragemparam, // passamos a tiragem como id para compatibilidade
+      authToken 
+    });
   };
 
   return (
@@ -149,20 +149,20 @@ export default function ListaEmprestimosClient() {
 
       {/* Diálogo de confirmação */}
       {confirmingReturn && (
-        <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+        <div className="mb-4 rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-md">
           <p className="mb-3 text-yellow-800">
-            Confirmar devolução do empréstimo #{confirmingReturn}?
+            Confirmar devolução da tiragem #{confirmingReturn}?
           </p>
           <div className="flex space-x-2">
             <button
               onClick={() => handleReturnBook(confirmingReturn)}
-              className="rounded-md bg-blue-600 px-3 py-1 text-white transition-colors hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Confirmar
             </button>
             <button
               onClick={() => setConfirmingReturn(null)}
-              className="rounded-md bg-gray-200 px-3 py-1 text-gray-700 transition-colors hover:bg-gray-300"
+              className="rounded-lg bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400"
             >
               Cancelar
             </button>
@@ -253,7 +253,7 @@ export default function ListaEmprestimosClient() {
               <td className="px-6 py-4 text-sm whitespace-nowrap">
                 {!emprestimo.dt_devolucao && (
                   <button
-                    onClick={() => setConfirmingReturn(emprestimo.id)}
+                    onClick={() => setConfirmingReturn(emprestimo.tiragem)}
                     className="rounded-md px-3 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-800"
                     title="Registrar devolução"
                   >
