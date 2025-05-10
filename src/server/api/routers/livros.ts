@@ -92,7 +92,8 @@ export const livroRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      const url = `${baseUrl}/api/v1/tiragem/`;
+      // Removido prefixo api/v1 duplicado pois já está incluído no baseUrl
+      const url = `${baseUrl}/tiragem/`;
       const { data } = await axios.post<TiragemResponse>(
         url,
         { isbn: input.isbn, livro: input.livro, disponivel: input.disponivel },
@@ -172,7 +173,7 @@ export const livroRouter = createTRPCRouter({
   getLivro: publicProcedure
     .input(z.object({ authToken: z.string(), id: z.string() }))
     .query(async ({ input }) => {
-      const url = `${baseUrl}exemplares/${input.id}/`;
+      const url = `${baseUrl}/exemplares/${input.id}/`;
       const { data } = await axios.get<LivroDadosResponse>(url, {
         headers: {
           "Content-Type": "application/json",

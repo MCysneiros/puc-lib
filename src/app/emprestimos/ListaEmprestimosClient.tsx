@@ -10,21 +10,27 @@ export default function ListaEmprestimosClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filtroPendentes, setFiltroPendentes] = useState(false);
-  const [filteredEmprestimos, setFilteredEmprestimos] = useState<EmprestimoDTO[]>([]);
+  const [filteredEmprestimos, setFilteredEmprestimos] = useState<
+    EmprestimoDTO[]
+  >([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [confirmingReturn, setConfirmingReturn] = useState<number | null>(null);
   const authToken = useAuthStore.getState().getAccessToken();
+
+  console.log(emprestimos);
 
   // Buscar todos os empréstimos usando a query todosOsEmprestimos
   const emprestimosQuery = api.emprestimo.todosOsEmprestimos.useQuery(
     { authToken: authToken ?? "" },
     { enabled: !!authToken, refetchOnWindowFocus: false },
   );
-  
+
   // Mutation para registrar devolução de livro
   const devolucaoMutation = api.emprestimo.devolucao.useMutation({
     onSuccess: (data) => {
-      setSuccessMessage(`Devolução registrada com sucesso em ${new Date(data.data_devolucao).toLocaleDateString("pt-BR")}`); 
+      setSuccessMessage(
+        `Devolução registrada com sucesso em ${new Date(data.data_devolucao).toLocaleDateString("pt-BR")}`,
+      );
       setConfirmingReturn(null);
       // Refetch para atualizar a lista de empréstimos
       void emprestimosQuery.refetch();
@@ -52,14 +58,14 @@ export default function ListaEmprestimosClient() {
       setIsLoading(false);
     }
   }, [emprestimosQuery.data, emprestimosQuery.error]);
-  
+
   // Filter emprestimos when filtroPendentes changes
   useEffect(() => {
     if (emprestimos.length > 0) {
       setFilteredEmprestimos(
         filtroPendentes
           ? emprestimos.filter((emprestimo) => !emprestimo.dt_devolucao)
-          : emprestimos
+          : emprestimos,
       );
     }
   }, [emprestimos, filtroPendentes]);
@@ -104,24 +110,34 @@ export default function ListaEmprestimosClient() {
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg shadow-lg bg-white p-6">
+    <div className="overflow-x-auto rounded-lg bg-white p-6 shadow-lg">
       {/* Mensagem de sucesso */}
       {successMessage && (
-        <div className="mb-4 p-4 rounded-lg bg-green-50 text-green-700 border border-green-200">
+        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700">
           <div className="flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            <svg
+              className="mr-2 h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
             </svg>
             {successMessage}
           </div>
         </div>
       )}
-      
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800">Lista de Empréstimos</h2>
+
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-800">
+          Lista de Empréstimos
+        </h2>
         <button
           onClick={() => setFiltroPendentes(!filtroPendentes)}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+          className={`rounded-lg px-4 py-2 font-medium transition-colors ${
             filtroPendentes
               ? "bg-blue-600 text-white"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -133,25 +149,27 @@ export default function ListaEmprestimosClient() {
 
       {/* Diálogo de confirmação */}
       {confirmingReturn && (
-        <div className="mb-4 p-4 rounded-lg bg-yellow-50 border border-yellow-200">
-          <p className="text-yellow-800 mb-3">Confirmar devolução do empréstimo #{confirmingReturn}?</p>
+        <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="mb-3 text-yellow-800">
+            Confirmar devolução do empréstimo #{confirmingReturn}?
+          </p>
           <div className="flex space-x-2">
             <button
               onClick={() => handleReturnBook(confirmingReturn)}
-              className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="rounded-md bg-blue-600 px-3 py-1 text-white transition-colors hover:bg-blue-700"
             >
               Confirmar
             </button>
             <button
               onClick={() => setConfirmingReturn(null)}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+              className="rounded-md bg-gray-200 px-3 py-1 text-gray-700 transition-colors hover:bg-gray-300"
             >
               Cancelar
             </button>
           </div>
         </div>
       )}
-      <table className="min-w-full divide-y divide-gray-200 border rounded-lg overflow-hidden">
+      <table className="min-w-full divide-y divide-gray-200 overflow-hidden rounded-lg border">
         <thead className="bg-gray-50">
           <tr>
             <th
@@ -200,53 +218,51 @@ export default function ListaEmprestimosClient() {
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {filteredEmprestimos.map((emprestimo) => (
-              <tr key={emprestimo.id}>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
-                  {emprestimo.id}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  {emprestimo.nome_aluno}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  {emprestimo.titulo_livro}
-                </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
-                  {new Date(emprestimo.dt_emprestimo).toLocaleDateString(
-                    "pt-BR",
-                  )}
-                </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
-                  {new Date(emprestimo.previsao_devolucao).toLocaleDateString(
-                    "pt-BR",
-                  )}
-                </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap">
-                  {emprestimo.dt_devolucao ? (
-                    <span className="inline-flex rounded-full bg-green-100 px-2 text-xs leading-5 font-semibold text-green-800">
-                      Devolvido em{" "}
-                      {new Date(emprestimo.dt_devolucao).toLocaleDateString(
-                        "pt-BR",
-                      )}
-                    </span>
-                  ) : (
-                    <span className="inline-flex rounded-full bg-yellow-100 px-2 text-xs leading-5 font-semibold text-yellow-800">
-                      Pendente
-                    </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap">
-                  {!emprestimo.dt_devolucao && (
-                    <button
-                      onClick={() => setConfirmingReturn(emprestimo.id)}
-                      className="text-blue-600 hover:text-blue-800 font-medium text-sm px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
-                      title="Registrar devolução"
-                    >
-                      Devolver
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+            <tr key={emprestimo.id}>
+              <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
+                {emprestimo.id}
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-900">
+                {emprestimo.nome_aluno}
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-900">
+                {emprestimo.titulo_livro}
+              </td>
+              <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
+                {new Date(emprestimo.dt_emprestimo).toLocaleDateString("pt-BR")}
+              </td>
+              <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">
+                {new Date(emprestimo.previsao_devolucao).toLocaleDateString(
+                  "pt-BR",
+                )}
+              </td>
+              <td className="px-6 py-4 text-sm whitespace-nowrap">
+                {emprestimo.dt_devolucao ? (
+                  <span className="inline-flex rounded-full bg-green-100 px-2 text-xs leading-5 font-semibold text-green-800">
+                    Devolvido em{" "}
+                    {new Date(emprestimo.dt_devolucao).toLocaleDateString(
+                      "pt-BR",
+                    )}
+                  </span>
+                ) : (
+                  <span className="inline-flex rounded-full bg-yellow-100 px-2 text-xs leading-5 font-semibold text-yellow-800">
+                    Pendente
+                  </span>
+                )}
+              </td>
+              <td className="px-6 py-4 text-sm whitespace-nowrap">
+                {!emprestimo.dt_devolucao && (
+                  <button
+                    onClick={() => setConfirmingReturn(emprestimo.id)}
+                    className="rounded-md px-3 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-800"
+                    title="Registrar devolução"
+                  >
+                    Devolver
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

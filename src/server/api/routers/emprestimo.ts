@@ -74,18 +74,49 @@ export const emprestimoRouter = createTRPCRouter({
     )
     .mutation(
       async ({ input }: { input: { authToken: string; id: number } }) => {
-        const url = `${baseUrl}/devolucao/${input.id}/registrar/`;
-        const { data } = await axios.patch<DevolucaoResponse>(
-          url,
-          { id: input.id },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${input.authToken}`,
-            },
-          },
-        );
-        return data;
+        try {
+          // Usando exatamente o formato do comando curl fornecido
+          const url = `${baseUrl}/devolucao/${input.id}/registrar/`;
+          console.log(`Tentando devolução com PATCH para ${url}`);
+
+          const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${input.authToken}`,
+          };
+
+          // Mantendo o payload mínimo conforme o PATCH original
+          const response = await axios.patch<DevolucaoResponse>(
+            url,
+            { id: input.id },
+            { headers },
+          );
+
+          console.log("Devolução registrada com sucesso:", response.data);
+          return response.data;
+        } catch (error) {
+          console.error("Erro na devolução:", error);
+
+          if (axios.isAxiosError(error)) {
+            console.error("Status:", error.response?.status);
+            console.error("Data:", error.response?.data);
+            console.error("URL:", error.config?.url);
+
+            if (error.response?.status === 404) {
+              throw new Error(
+                `O empréstimo com ID ${input.id} não foi encontrado ou não pode ser devolvido.`,
+              );
+            }
+            if (error.response?.status === 500) {
+              throw new Error(
+                `Erro interno no servidor ao processar a devolução do empréstimo ${input.id}.`,
+              );
+            }
+          }
+
+          throw new Error(
+            `Falha ao registrar devolução: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
       },
     ),
 
@@ -116,16 +147,47 @@ export const emprestimoRouter = createTRPCRouter({
     )
     .query(
       async ({ input }: { input: { aluno: number; authToken: string } }) => {
-        const { data } = await axios.get<EmprestimoDTO[]>(
-          `${baseUrl}/alunos/${input.aluno}/emprestimos/`,
-          {
+        try {
+          console.log(`Buscando empréstimos para o aluno ID: ${input.aluno}`);
+
+          // Usando exatamente o formato do comando curl fornecido
+          // Note que o baseUrl já inclui /api/v1, então não precisamos adicionar novamente
+          const url = `${env.NEXT_PUBLIC_API_URL.replace("/api/v1", "")}/aluno/${input.aluno}/emprestimos/`;
+          console.log(`URL da requisição: ${url}`);
+
+          const { data } = await axios.get<EmprestimoDTO[]>(url, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${input.authToken}`,
             },
-          },
-        );
-        return data;
+          });
+
+          console.log(`Emprestimos encontrados: ${data?.length || 0}`);
+          return data || [];
+        } catch (error) {
+          console.error(
+            `Erro ao buscar empréstimos do aluno ${input.aluno}:`,
+            error,
+          );
+
+          // Detalhamento do erro para debug
+          if (axios.isAxiosError(error)) {
+            console.error("Status:", error.response?.status);
+            console.error("Data:", error.response?.data);
+            console.error("URL:", error.config?.url);
+
+            // Se for 404, provavelmente o aluno não tem empréstimos
+            if (error.response?.status === 404) {
+              console.log("Aluno não tem empréstimos ou endpoint retornou 404");
+              return [];
+            }
+          }
+
+          // Para outros erros, lançamos uma exceção
+          throw new Error(
+            `Erro ao buscar empréstimos do aluno ${input.aluno}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
       },
     ),
 });

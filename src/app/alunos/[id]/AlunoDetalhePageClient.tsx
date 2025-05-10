@@ -17,7 +17,6 @@ export default function AlunoDetalhePageClient() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   // Buscar o aluno usando um estado local para garantir a reatividade
   const [currentAluno, setCurrentAluno] = useState<AlunoEditable | null>(null);
@@ -31,22 +30,43 @@ export default function AlunoDetalhePageClient() {
     .alunos.find((a) => a.id === Number(id));
 
   // Hook do tRPC para buscar empréstimos
+  const alunoId = Number(id);
+  const authToken = useAuthStore.getState().getAccessToken() ?? "";
+  
   const emprestimoQuery = api.emprestimo.emprestimosPorAluno.useQuery(
     {
-      aluno: currentAluno?.id ?? 0,
-      authToken: useAuthStore.getState().getAccessToken() ?? "",
+      aluno: alunoId,
+      authToken,
     },
     {
-      enabled: !!currentAluno && !!useAuthStore.getState().getAccessToken(),
+      enabled: alunoId > 0 && !!authToken,
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      retry: 3,
+      retryDelay: 1000, // 1 segundo entre tentativas
     },
   );
 
-  // Atualizar empréstimos quando a query tiver sucesso
+  // Atualizar empréstimos quando a query tiver sucesso ou erro
   useEffect(() => {
-    if (emprestimoQuery.data) {
-      setEmprestimos(emprestimoQuery.data);
+    // Tratamento quando dados estão disponíveis
+    if (emprestimoQuery.isSuccess) {
+      if (emprestimoQuery.data) {
+        setEmprestimos(emprestimoQuery.data);
+      } else {
+        // Se a query teve sucesso mas não há dados, definimos uma lista vazia
+        setEmprestimos([]);
+      }
     }
-  }, [emprestimoQuery.data]);
+    
+    // Lidar com erros
+    if (emprestimoQuery.isError) {
+      console.error("Erro ao buscar empréstimos:", emprestimoQuery.error);
+      // Não exibimos o erro na UI para não confundir o usuário
+      // quando o aluno não tem empréstimos
+      setEmprestimos([]);
+    }
+  }, [emprestimoQuery.isSuccess, emprestimoQuery.data, emprestimoQuery.isError, emprestimoQuery.error]);
 
   useEffect(() => {
     if (alunoFromStore) {
@@ -119,40 +139,6 @@ export default function AlunoDetalhePageClient() {
       return;
     }
 
-    try {
-      try {
-        await api.aluno.editAluno.mutate({
-          id: String(editedAluno.id),
-          authToken,
-          updates: {
-            cpf: editedAluno.cpf,
-            nome: editedAluno.nome,
-            sobrenome: editedAluno.sobrenome,
-            nascimento: editedAluno.nascimento,
-            email: editedAluno.email,
-            tel1: editedAluno.tel1,
-            tel2: editedAluno.tel2,
-            endereco: editedAluno.endereco,
-          },
-        });
-        setSuccess("Aluno atualizado com sucesso!");
-        setEditMode(false);
-        setCurrentAluno(editedAluno);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError("Erro ao atualizar o aluno. Tente novamente.");
-        }
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("Erro ao atualizar o aluno. Tente novamente.");
-      }
-    }
-
     // Criar objeto com os campos modificados
     const updates: Record<string, unknown> = {};
 
@@ -170,12 +156,30 @@ export default function AlunoDetalhePageClient() {
 
     console.log("Salvando alterações:", updates);
 
-    // Chamar a API tRPC com o token armazenado no auth-store
-    mutation.mutate({
-      id: String(currentAluno.id),
-      authToken,
-      updates,
-    });
+    try {
+      // Usar o mutation hook definido anteriormente - passar o objeto updates correto
+      mutation.mutate({
+        id: String(currentAluno.id),
+        authToken: authToken,
+        updates: updates as {
+          cpf?: string;
+          nome?: string;
+          sobrenome?: string;
+          nascimento?: string;
+          email?: string;
+          tel1?: string;
+          tel2?: string;
+          endereco?: string;
+        },
+      });
+      // Não precisamos esperar pela resposta, já que o onSuccess cuida disso
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Erro ao atualizar o aluno. Tente novamente.");
+      }
+    }
   };
 
   // Renderiza o campo com a opção de edição
@@ -228,7 +232,17 @@ export default function AlunoDetalhePageClient() {
             />
           </div>
         ) : (
-          <div className="flex items-center gap-4"></div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleEditMode}
+              className="rounded-full bg-blue-600 p-2 text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label="Editar aluno"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+          </div>
         )}
       </div>
 
