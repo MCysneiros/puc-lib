@@ -3,17 +3,9 @@ import { render } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 
 // Import components
-import AlunosTable from "~/app/_components/AlunosTable";
 import AuthTokenInitializer from "~/app/_components/AuthTokenInitializer";
-import EmprestimosPendentes from "~/app/_components/EmprestimosPendentes";
-import EstatisticaDashboard from "~/app/_components/EstatisticaDashboard";
 import EstatisticaTable from "~/app/_components/EstatisticaTable";
-import LivrosTableClient from "~/app/_components/LivrosTableClient";
-import ModalCreateAluno from "~/app/_components/ModalCreateAluno";
-import ModalCreateLivro from "~/app/_components/ModalCreateLivro";
-import ModalState from "~/app/_components/ModalState";
 import Navbar from "~/app/_components/Navbar";
-import { LivrosTable } from "~/app/_components/LivrosTable";
 
 // Simple smoke tests for main project components
 
