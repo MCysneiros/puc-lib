@@ -11,7 +11,7 @@ export const tokenRouter = createTRPCRouter({
     .input(z.object({ username: z.string(), password: z.string() }))
     .mutation(async ({ input }) => {
       const { data } = await axios.post<Token>(
-        `http://3.82.202.97/api/token/`,
+        `https://www.firminostech.com.br/api/token/`,
         {
           username: input.username,
           password: input.password,
